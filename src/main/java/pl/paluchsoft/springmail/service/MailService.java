@@ -1,27 +1,24 @@
 package pl.paluchsoft.springmail.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.MailParseException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import pl.paluchsoft.springmail.AppConfig;
 import pl.paluchsoft.springmail.Mail;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import java.io.*;
-import freemarker.template.Configuration;
-import java.util.Map;
+import java.sql.PreparedStatement;
+import java.util.Objects;
 
-@Service("mailService")
+@Service
     public class MailService {
         private final JavaMailSender mailSender;
-//        @Autowired
-        Configuration bean;
 
-        @Autowired
         public MailService(JavaMailSender mailSender) {
             this.mailSender = mailSender;
         }
@@ -34,28 +31,14 @@ import java.util.Map;
                 helper.setFrom(mail.getMailFrom());
                 helper.setTo(mail.getMailTo());
                 helper.setSubject(mail.getMailSubject());
-                mail.setMailContent(getContentFromTemplate(mail.getModel()));
+                mail.setMailContent(AppConfig.getContentFromTemplate(mail.getModel()));
                 helper.setText(mail.getMailContent(), true);
-                helper.addAttachment("06.JPEG", new ClassPathResource("06.JPEG"));
-                helper.addAttachment("walentynki.pdf", new ClassPathResource("walentynki.pdf"));
-                mailSender.send(mimeMessage);
+                FileSystemResource file = new FileSystemResource("C:/users/Anusia/Pulpit/zalaczniki");
+                helper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
             } catch (MessagingException e) {
-                e.printStackTrace();
+               throw new MailParseException(e);
             }
-        }
-
-
-
-        public String getContentFromTemplate(Map<String, Object> model) {
-            StringBuilder content = new StringBuilder();
-            try {
-//                Template template = new Template("template.txt", new StringReader(), bean);
-//                content.append(FreeMarkerTemplateUtils.processTemplateIntoString(template, model));
-                content.append(FreeMarkerTemplateUtils
-                        .processTemplateIntoString(bean.getTemplate("template.txt"), model));
-            } catch (Exception e) {
-                e.printStackTrace();
-            } return content.toString();
+                mailSender.send(mimeMessage);
         }
 
         public void addAtt(String file) throws IOException, MessagingException {

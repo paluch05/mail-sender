@@ -1,8 +1,6 @@
 package pl.paluchsoft.springmail;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import pl.paluchsoft.springmail.readFromProperties.ReadPropertiesFile;
+import org.springframework.web.bind.annotation.PostMapping;
 import pl.paluchsoft.springmail.service.MailService;
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -17,11 +15,11 @@ public class MailController {
         this.mailService = mailService;
     }
 
-    @RequestMapping(value = "/sendMail", method = RequestMethod.POST)
+    @PostMapping(value = "/sendMail")
     public void sendMail() throws MessagingException, IOException {
         Mail mail = new Mail();
         mail.setMailFrom("wesolakulka1@gmail.com");
-        mail.setMailTo(ReadPropertiesFile.readPropFile("application.properties"));
+        mail.setMailTo("recipients.properties");
         mail.setMailSubject("Working on first mailsender app");
         Map<String, Object> model = new HashMap<String, Object>();
             model.put("firstName", "Client");
