@@ -1,2 +1,18 @@
-server:
-  port: 9292
+mail:
+  from: annapaluch05@gmail.com
+spring:
+  mail:
+    host: host
+    password: password
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          port: 587
+          starttls:
+            enable: true
+            required: true
+        transport:
+          protocol: smtp
+    username: username
