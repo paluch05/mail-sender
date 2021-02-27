@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pl.paluchsoft.springmailsender.service.MailService;
 
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,6 +25,6 @@ class MailControllerTest {
     @DisplayName("Should call service to send an email")
     void shouldCallServiceToSendAnEmail() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/mail"));
-        verify(mailService, times(1)).sendSimpleMessage(anyString(), anyString(), anyString());
+        verify(mailService, times(1)).sendMessage(anyString(), anyString(), anyString(), anyList());
     }
 }
