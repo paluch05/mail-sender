@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import pl.paluchsoft.springmailsender.model.Recipient;
-import pl.paluchsoft.springmailsender.service.MailService;
-import pl.paluchsoft.springmailsender.service.RecipientsService;
-import pl.paluchsoft.springmailsender.service.SubjectService;
-import pl.paluchsoft.springmailsender.service.TemplateService;
+import pl.paluchsoft.springmailsender.service.*;
 
+import javax.mail.MessagingException;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
@@ -26,17 +25,20 @@ public class MailController {
     private final TemplateService templateService;
     private final RecipientsService recipientsService;
     private final SubjectService subjectService;
+    private final AttachmentService attachmentService;
 
     public MailController(MailService mailService, TemplateService templateService,
-                          RecipientsService recipientsService, SubjectService subjectService) {
+                          RecipientsService recipientsService, SubjectService subjectService, AttachmentService attachmentService) {
         this.mailService = mailService;
         this.templateService = templateService;
         this.recipientsService = recipientsService;
         this.subjectService = subjectService;
+        this.attachmentService = attachmentService;
     }
 
     @GetMapping("/mail/{template}/{recipients}")
-    public void sendMail(@PathVariable("template") String template, @PathVariable("recipients") String recipients) throws IOException, TemplateException {
+    public void sendMail(@PathVariable("template") String template, @PathVariable("recipients") String recipients)
+            throws IOException, TemplateException, MessagingException {
         logger.info("sending email");
         List<Recipient> recipientsList;
         try {
@@ -47,7 +49,8 @@ public class MailController {
         for (Recipient recipient : recipientsList) {
             String renderedTemplate = templateService.getRenderedTemplate(template, recipient.getName());
             String readSubject = subjectService.getSubject(template);
-            mailService.sendSimpleMessage(recipient.getEmail(), readSubject, renderedTemplate);
+            List<File> attachments = attachmentService.getAttachments(template);
+            mailService.sendMessage(recipient.getEmail(), readSubject, renderedTemplate, attachments);
         }
         logger.info("sent email");
     }

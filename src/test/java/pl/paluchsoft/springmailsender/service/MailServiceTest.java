@@ -9,6 +9,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
+import javax.mail.MessagingException;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
@@ -25,16 +28,16 @@ class MailServiceTest {
     @Test
     @DisplayName("Should throw IllegalArgumentException when passed null values")
     void testNullChecks() {
-        assertThrows(IllegalArgumentException.class, () -> mailService.sendSimpleMessage(null, null, null));
+        assertThrows(IllegalArgumentException.class, () -> mailService.sendMessage(null, null, null, null));
     }
 
     @Test
     @DisplayName("Should send simple email")
-    void shouldSendSimpleEmail() {
+    void shouldSendSimpleEmail() throws MessagingException {
         String to = "cokolwiek";
         String subject = "cokolwiek";
         String text = "cokolwiek";
-        mailService.sendSimpleMessage(to, subject, text);
+        mailService.sendMessage(to, subject, text, List.of());
         verify(emailSender, times(1)).send(argThat((ArgumentMatcher<SimpleMailMessage>)
                 message -> message.getTo()[0].equals(to) && message.getSubject().equals(subject) && message.getText().equals(text)));
     }
