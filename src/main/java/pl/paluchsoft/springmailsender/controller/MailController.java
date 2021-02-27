@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import pl.paluchsoft.springmailsender.model.Recipient;
 import pl.paluchsoft.springmailsender.service.MailService;
 import pl.paluchsoft.springmailsender.service.RecipientsService;
+import pl.paluchsoft.springmailsender.service.SubjectService;
 import pl.paluchsoft.springmailsender.service.TemplateService;
 
 import java.io.FileNotFoundException;
@@ -24,11 +25,14 @@ public class MailController {
     private final MailService mailService;
     private final TemplateService templateService;
     private final RecipientsService recipientsService;
+    private final SubjectService subjectService;
 
-    public MailController(MailService mailService, TemplateService templateService, RecipientsService recipientsService) {
+    public MailController(MailService mailService, TemplateService templateService,
+                          RecipientsService recipientsService, SubjectService subjectService) {
         this.mailService = mailService;
         this.templateService = templateService;
         this.recipientsService = recipientsService;
+        this.subjectService = subjectService;
     }
 
     @GetMapping("/mail/{template}/{recipients}")
@@ -42,10 +46,9 @@ public class MailController {
         }
         for (Recipient recipient : recipientsList) {
             String renderedTemplate = templateService.getRenderedTemplate(template, recipient.getName());
-            mailService.sendSimpleMessage(recipient.getEmail(), "Mail", renderedTemplate);
+            String readSubject = subjectService.getSubject(template);
+            mailService.sendSimpleMessage(recipient.getEmail(), readSubject, renderedTemplate);
         }
         logger.info("sent email");
     }
-
-
 }

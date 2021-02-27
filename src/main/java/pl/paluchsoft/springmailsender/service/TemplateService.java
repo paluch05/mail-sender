@@ -9,6 +9,8 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,14 +19,25 @@ public class TemplateService {
 
     private final Configuration templateConfiguration;
 
-    @Value("${mail.templates.folder}")
-    private String templatesFolder;
+    private final String templatesFolder;
 
-    public TemplateService(Configuration templateConfiguration) {
+    public TemplateService(Configuration templateConfiguration, @Value("${mail.templates.folder}") String templatesFolder) {
         this.templateConfiguration = templateConfiguration;
+        if (!Files.exists(Path.of(templatesFolder))) {
+            File file = new File(templatesFolder);
+            if (!file.exists()) {
+                throw new RuntimeException("Template folder " + templatesFolder + " does not exist");
+            }
+            this.templatesFolder = file.getAbsolutePath();
+        } else {
+            this.templatesFolder = templatesFolder;
+        }
     }
 
     public String getRenderedTemplate(String templateName, String recipientName) throws IOException, TemplateException {
+        if (templateName == null || recipientName == null) {
+            throw new IllegalArgumentException("Template name or recipient name cannot be null");
+        }
         templateConfiguration.setDirectoryForTemplateLoading(new File(templatesFolder));
         Template template = templateConfiguration.getTemplate(templateName + ".ftl");
         Map<String, Object> model = new HashMap<>();

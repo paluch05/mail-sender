@@ -35,6 +35,7 @@ class MailServiceTest {
         String subject = "cokolwiek";
         String text = "cokolwiek";
         mailService.sendSimpleMessage(to, subject, text);
-        verify(emailSender, times(1)).send(argThat((ArgumentMatcher<SimpleMailMessage>) message -> message.getTo()[0].equals(to) && message.getSubject().equals(subject) && message.getText().equals(text)));
+        verify(emailSender, times(1)).send(argThat((ArgumentMatcher<SimpleMailMessage>)
+                message -> message.getTo()[0].equals(to) && message.getSubject().equals(subject) && message.getText().equals(text)));
     }
 }

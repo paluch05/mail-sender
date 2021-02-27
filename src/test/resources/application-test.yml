@@ -1,0 +1,5 @@
+mail:
+  templates:
+    folder: src/test/resources/templates
+  recipients:
+    folder: src/test/resources/recipients
