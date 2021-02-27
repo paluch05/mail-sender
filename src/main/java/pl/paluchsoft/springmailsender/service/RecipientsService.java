@@ -24,7 +24,7 @@ public class RecipientsService {
         if (!Files.exists(path)) {
             throw new FileNotFoundException("The list " + name + " does not exist");
         }
-        return Files.lines(path).map(line -> {
+        return Files.lines(path).filter(line -> !line.trim().isEmpty()).map(line -> {
             String[] split = line.split(",");
             return new Recipient(split[0], split[1]);
         }).collect(Collectors.toList());
