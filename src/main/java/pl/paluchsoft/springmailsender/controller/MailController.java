@@ -11,7 +11,6 @@ import org.springframework.web.server.ResponseStatusException;
 import pl.paluchsoft.springmailsender.model.Recipient;
 import pl.paluchsoft.springmailsender.service.*;
 
-import javax.mail.MessagingException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,7 +37,7 @@ public class MailController {
 
     @GetMapping("/mail/{template}/{recipients}")
     public void sendMail(@PathVariable("template") String template, @PathVariable("recipients") String recipients)
-            throws IOException, TemplateException, MessagingException {
+            throws IOException {
         logger.info("sending email");
         List<Recipient> recipientsList;
         try {
@@ -47,10 +46,14 @@ public class MailController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
         for (Recipient recipient : recipientsList) {
-            String renderedTemplate = templateService.getRenderedTemplate(template, recipient.getName());
-            String readSubject = subjectService.getSubject(template);
-            List<File> attachments = attachmentService.getAttachments(template);
-            mailService.sendMessage(recipient.getEmail(), readSubject, renderedTemplate, attachments);
+            try {
+                String renderedTemplate = templateService.getRenderedTemplate(template, recipient.getName());
+                String readSubject = subjectService.getSubject(template);
+                List<File> attachments = attachmentService.getAttachments(template);
+                mailService.sendMessage(recipient.getEmail(), readSubject, renderedTemplate, attachments);
+            } catch (TemplateException e) {
+                throw new FileNotFoundException("Could not find the template so mail is unable to be sent");
+            }
         }
         logger.info("sent email");
     }
