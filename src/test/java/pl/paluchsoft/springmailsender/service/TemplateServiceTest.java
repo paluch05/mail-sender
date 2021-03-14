@@ -18,11 +18,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ActiveProfiles("test")
 class TemplateServiceTest {
 
-    @Autowired
-    TemplateService templateService;
-
     @MockBean
     MailController mailController;
+    @Autowired
+    TemplateService templateService;
 
     @Test
     @DisplayName("Should throw IllegalArgumentException when passed null values")

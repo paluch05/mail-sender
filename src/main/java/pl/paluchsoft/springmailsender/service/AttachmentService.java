@@ -15,15 +15,18 @@ public class AttachmentService {
     public AttachmentService(@Value("${mail.templates.folder}") String templatesFolder) {
         File file = new File(templatesFolder);
         if (!file.exists()) {
-            throw new RuntimeException("Template folder " + templatesFolder + " does not exist");
+            throw new IllegalArgumentException("Template folder " + templatesFolder + " does not exist");
         }
         this.templatesFolder = file.getAbsolutePath();
     }
 
     public List<File> getAttachments(String templateName) {
+        if (templateName == null || templateName.isEmpty()) {
+            throw new IllegalArgumentException("TemplateName can not be null or empty");
+        }
         File attachmentsFolder = Path.of(templatesFolder, templateName).toFile();
         if (!attachmentsFolder.exists() && !attachmentsFolder.isDirectory()) {
-            throw new RuntimeException(attachmentsFolder.getAbsolutePath() + " does not exist or is not a directory");
+            throw new IllegalArgumentException(attachmentsFolder.getAbsolutePath() + " does not exist or is not a directory");
         }
         File[] files = attachmentsFolder.listFiles();
         return Arrays.asList(files);

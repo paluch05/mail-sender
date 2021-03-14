@@ -27,18 +27,22 @@ public class MailService {
     }
 
     public void sendMessage(
-            String to, String subject, String text, List<File> attachments) throws MessagingException {
-        if (to == null || subject == null || text == null) {
+            String to, String subject, String text, List<File> attachments) {
+        if (to == null || subject == null || text == null || attachments == null) {
             throw new IllegalArgumentException("Arguments cannot be null");
         }
         logger.info("username: {}", username);
         MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(text);
-        for (File attachment : attachments) {
-            helper.addAttachment(attachment.getName(), attachment);
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(text);
+            for (File attachment : attachments) {
+                helper.addAttachment(attachment.getName(), attachment);
+            }
+        } catch (MessagingException e) {
+            throw new RuntimeException("Unable to send an email");
         }
         emailSender.send(message);
     }
