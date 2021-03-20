@@ -26,8 +26,8 @@ public class MailController {
     private final SubjectService subjectService;
     private final AttachmentService attachmentService;
 
-    public MailController(MailService mailService, TemplateService templateService,
-                          RecipientsService recipientsService, SubjectService subjectService, AttachmentService attachmentService) {
+    public MailController(MailService mailService, TemplateService templateService, RecipientsService recipientsService,
+                          SubjectService subjectService, AttachmentService attachmentService) {
         this.mailService = mailService;
         this.templateService = templateService;
         this.recipientsService = recipientsService;
@@ -43,6 +43,7 @@ public class MailController {
         try {
             recipientsList = recipientsService.getRecipients(recipients);
         } catch (FileNotFoundException e) {
+            logger.error("Could not find the list with recipients");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
         for (Recipient recipient : recipientsList) {
@@ -52,6 +53,7 @@ public class MailController {
                 List<File> attachments = attachmentService.getAttachments(template);
                 mailService.sendMessage(recipient.getEmail(), readSubject, renderedTemplate, attachments);
             } catch (TemplateException e) {
+                logger.error("Could not find the template");
                 throw new FileNotFoundException("Could not find the template so mail is unable to be sent");
             }
         }
