@@ -24,13 +24,11 @@ class RecipientsServiceTest {
     @Autowired
     RecipientsService recipientsService;
 
-
     @Test
     @DisplayName("Should throw IllegalArgumentException when passed null values")
     void testNullChecks() {
         assertThrows(IllegalArgumentException.class, () -> recipientsService.getRecipients(null));
     }
-
 
     @Test
     @DisplayName("Should get list of recipients")

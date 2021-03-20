@@ -16,7 +16,6 @@ import java.util.Map;
 public class TemplateService {
 
     private final Configuration templateConfiguration;
-
     private final String templatesFolder;
 
     public TemplateService(Configuration templateConfiguration, @Value("${mail.templates.folder}") String templatesFolder) {
@@ -27,7 +26,7 @@ public class TemplateService {
         }
         this.templatesFolder = file.getAbsolutePath();
     }
-    
+
     public String getRenderedTemplate(String templateName, String recipientName) throws IOException, TemplateException {
         if (templateName == null || recipientName == null) {
             throw new IllegalArgumentException("Template name or recipient name cannot be null");

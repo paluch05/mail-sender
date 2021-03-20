@@ -26,7 +26,6 @@ public class SubjectService {
         }
     }
 
-
     public String getSubject(String templateName) throws IOException {
         if (templateName == null) {
             throw new IllegalArgumentException("File name cannot be null");
